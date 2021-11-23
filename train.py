@@ -16,12 +16,12 @@ from networks.CRN import NET_Wrapper
 from utils.progressbar import progressbar as pb
 from utils.util import makedirs, saveYAML
 
-# wandb.init(project="CRN", entity="zhaofei")
-# wandb.config = {
-#   "learning_rate": 0.001,
-#   "epochs": 15,
-#   "batch_size": 32
-# }
+wandb.init(project="VAD", entity="zhaofei")
+wandb.config = {
+  "learning_rate": 0.001,
+  "epochs": 15,
+  "batch_size": 32
+}
 
 
 def validate(network, eval_loader, weight, *criterion):
@@ -85,10 +85,10 @@ if __name__ == '__main__':
     tr_mix_dataset = Dataset(mode='train')
     tr_batch_dataloader = BatchDataLoader(tr_mix_dataset, config['BATCH_SIZE'], is_shuffle=True,
                                         workers_num=config['NUM_WORK'])
-    # if config['USE_CV']:
-    #     cv_mix_dataset = Dataset(mode='validate')
-    #     cv_batch_dataloader = BatchDataLoader(cv_mix_dataset, config['BATCH_SIZE'], is_shuffle=False,
-    #                                         workers_num=config['NUM_WORK'])
+    if config['USE_CV']:
+        cv_mix_dataset = Dataset(mode='validate')
+        cv_batch_dataloader = BatchDataLoader(cv_mix_dataset, config['BATCH_SIZE'], is_shuffle=False,
+                                            workers_num=config['NUM_WORK'])
 
     # device setting
     os.environ["CUDA_VISIBLE_DEVICES"] = config['CUDA_ID']
@@ -141,7 +141,7 @@ if __name__ == '__main__':
             # forward + backward + optimize
             optimizer.zero_grad()
             outputs = network(features)
-            loss = criterion(outputs, batch_info)
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
 
@@ -158,8 +158,8 @@ if __name__ == '__main__':
                                                                                       config['MAX_EPOCH'], running_loss,
                                                                                       accu_train_loss / cnt))
 
-            # wandb.log({"train_loss": running_loss})
-            # wandb.log({"avg_train_loss": accu_train_loss / cnt})
+            wandb.log({"train_loss": running_loss})
+            wandb.log({"avg_train_loss": accu_train_loss / cnt})
 
             if config['USE_CV'] and (i + 1) % config['EVAL_STEP'] == 0:
                 print()

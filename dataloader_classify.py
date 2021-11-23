@@ -6,11 +6,9 @@ from glob import glob
 from tqdm import tqdm
 from random import shuffle, sample, randint, choices
 from speechbrain.dataio.dataio import read_audio, write_audio
-from speechbrain.lobes.augment import TimeDomainSpecAugment
-from speechbrain.lobes.augment import EnvCorrupt
-from functools import reduce
-import torchaudio
+
 import numpy as np
+import pickle, os
 
 
 def frame_level_label(label_dict):
@@ -35,44 +33,58 @@ def frame_level_label(label_dict):
 class Dataset(Dataset):
     def __init__(self, mode='train'):
         super().__init__()
-
-        # 数据集音频和标签地址
-        data_list = sorted(glob('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_wav/*.wav'))
-        lab_list = sorted(glob('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_label/*.npy'))
-
-        # 数据比例
-        train_percent = 0.6
-        eval_percent = 0.1
-        test_percent = 0.3
-        len_data = len(data_list)
-
-        # 初始化音频、标签和字典
         self.src, self.trg = [], []
 
-        pack = list(zip(data_list, lab_list))
-        shuffle(pack)
-
-        # 训练集or测试集
-        if mode == 'validate':
-            pack = pack[int(len_data * train_percent): int(len_data * (train_percent + eval_percent))]
-        elif mode == 'train':
-            # pack = pack[: int(len_data * train_percent)]
-            pack = pack[: int(10)]
+        path = '/data01/zhaofei/data/VAD/' + mode + '_data.p'
+        if os.path.exists(path):
+            with open(path, 'rb') as f:
+                inp = pickle.load(f)
+                self.src = inp[0]
+                self.trg = inp[1]
         else:
-            pack = pack[int(len_data * (train_percent + eval_percent)) :]
+            # 数据集音频和标签地址
+            data_list = sorted(glob('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_wav/*.wav'))
+            lab_list = sorted(glob('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_label/*.npy'))
+
+            # 数据比例
+            train_percent = 0.6
+            eval_percent = 0.1
+            test_percent = 0.3
+            len_data = len(data_list)
+
+            # 初始化音频、标签和字典
+
+            pack = list(zip(data_list, lab_list))
+            shuffle(pack)
+
+            # 训练集or测试集
+            if mode == 'validate':
+                pack = pack[int(len_data * train_percent): int(len_data * (train_percent + eval_percent))]
+            elif mode == 'train':
+                pack = pack[: int(len_data * train_percent)]
+                # pack = pack[: int(10)]
+            else:
+                pack = pack[int(len_data * (train_percent + eval_percent)):]
+
+            # 读取音频和标签
+            print('Read audio and labels:')
+            for p, q in tqdm(pack):
+                wav_data = read_audio(p)
+                alpha_pow = 1 / (
+                            np.sqrt(np.sum(wav_data.numpy()) ** 2) / (wav_data.size()[0] * wav_data.size()[1]) + 1e-7)
+                wav_data *= alpha_pow
+                # np.sum(wav_data) ** 2
+
+                label_dict = np.load(q)
+                label_dict = np.minimum(label_dict, 2)
+                label_dict = frame_level_label(label_dict)
+                self.src.append(wav_data)
+                self.trg.append(label_dict)
+
+            with open(path, 'wb') as f:
+                pickle.dump((self.src, self.trg), f, pickle.HIGHEST_PROTOCOL)
 
 
-        # 读取音频和标签
-        print('Read audio and labels:')
-        for p,q in tqdm(pack):
-            wav_data = read_audio(p)
-            # wav_data = 1 / (np.sqrt(np.sum(wav_data.numpy()) ** 2) / (wav_data.size()[0] * wav_data.size()[1]) + 1e-7)
-
-            label_dict = np.load(q)
-            label_dict = np.minimum(label_dict, 2)
-            label_dict = frame_level_label(label_dict)
-            self.src.append(wav_data)
-            self.trg.append(label_dict)
 
     def __getitem__(self, index):
         return self.src[index], self.trg[index]

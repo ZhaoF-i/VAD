@@ -14,8 +14,8 @@ class NET_Wrapper(nn.Module):
         self.win_len = win_len
         self.win_offset = win_offset
         super(NET_Wrapper, self).__init__()
-        self.lstm_input_size = 256 * 30
-        self.lstm_layers = 1
+        self.lstm_input_size = 64 * 7
+        self.lstm_layers = 2
         self.conv1 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=(2, 3), stride=(1, 2))
         self.conv1_relu = nn.ELU()
         self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(2, 3), stride=(1, 2))
@@ -32,6 +32,11 @@ class NET_Wrapper(nn.Module):
                             hidden_size=self.lstm_input_size,
                             num_layers=self.lstm_layers,
                             batch_first=True)
+
+        self.conv2d_1 = nn.Conv2d(in_channels=64, out_channels=3, kernel_size=(1,1))
+        self.Aver_pooling = nn.AvgPool2d((1, 7))
+        self.linear_layer = nn.Sequential(nn.Linear(64, 3))
+        self.softmax = nn.Softmax(dim=2)
 
         self.conv6_t = nn.ConvTranspose2d(in_channels=512 * 2, out_channels=256, kernel_size=(2, 3), stride=(1, 2),
                                           padding=(1, 0))
@@ -70,6 +75,7 @@ class NET_Wrapper(nn.Module):
         self.conv2_t_bn = nn.BatchNorm2d(16)
         self.conv1_t_bn = nn.BatchNorm2d(8)
         self.pad = nn.ConstantPad2d((0, 0, 1, 0), value=0.)
+        self.pad1 = nn.ConstantPad2d((0, 0, 0, 2), value=0.)
         self.STFT = STFT(self.win_len, self.win_offset).cuda()
         self.MFCC = MFCC().cuda()
         self.Mel = Mel(64 ,400, 160, True).cuda()
@@ -85,31 +91,38 @@ class NET_Wrapper(nn.Module):
             Mel_array.append(mel)
 
         Mel_array = torch.stack(tuple(Mel_array), -1)
-        Mel_array = Mel_array.permute(0, 3, 1, 2)
+        Mel_array = Mel_array.permute(0, 3, 2, 1)
         input_feature = Mel_array
 
         # e1 = self.conv1_relu(self.conv1_bn(self.conv1(self.pad(torch.stack([input_feature], 1)))))
         e1 = self.conv1_relu(self.conv1_bn(self.conv1(self.pad(input_feature))))
         e2 = self.conv2_relu(self.conv2_bn(self.conv2(self.pad(e1))))
         e3 = self.conv3_relu(self.conv3_bn(self.conv3(self.pad(e2))))
-        e4 = self.conv4_relu(self.conv4_bn(self.conv4(self.pad(e3))))
-        e5 = self.conv5_relu(self.conv5_bn(self.conv5(self.pad(e4))))
-        # e6 = self.conv6_relu(self.conv6_bn(self.conv6(self.pad(e5))))
+        # e4 = self.conv4_relu(self.conv4_bn(self.conv4(self.pad(e3))))
+        # e5 = self.conv5_relu(self.conv5_bn(self.conv5(self.pad(e4))))
 
         self.lstm.flatten_parameters()
-        out_real = e5.contiguous().transpose(1, 2)
+        out_real = e3.contiguous().transpose(1, 2)
         out_real = out_real.contiguous().view(out_real.size(0), out_real.size(1), -1)
         lstm_out, _ = self.lstm(out_real)
-        lstm_out_real = lstm_out.contiguous().view(lstm_out.size(0), lstm_out.size(1), 256, 30)
-        lstm_out_real = lstm_out_real.contiguous().transpose(1, 2)
+        lstm_out_real = lstm_out.contiguous().view(lstm_out.size(0), lstm_out.size(1), 64, 7)
+        lstm_out_real = lstm_out_real.contiguous().transpose(1, 2)  #1,64,1001,7
 
-        t5 = self.conv5_t_relu(self.conv5_t_bn(self.conv5_t(self.pad(torch.cat((lstm_out_real, e5), dim=1)))))
-        t4 = self.conv4_t_relu(self.conv4_t_bn(self.conv4_t(self.pad(torch.cat((t5, e4), dim=1)))))
-        t3 = self.conv3_t_relu(self.conv3_t_bn(self.conv3_t(self.pad(torch.cat((t4, e3), dim=1)))))
-        t2 = self.conv2_t_relu(self.conv2_t_bn(self.conv2_t(self.pad(torch.cat((t3, e2), dim=1)))))
-        t1 = self.conv1_t_relu(self.conv1_t(self.pad(torch.cat((t2, e1), dim=1))))
-        out = torch.squeeze(t1, 1)
+        out = self.Aver_pooling(lstm_out_real)    #1,64,1001,1
+        out = torch.squeeze(out, 3)               #1,64,1001
+        out = out.permute(0, 2, 1)                #1,1001,64
+
+        out = self.linear_layer(out)
+        out = self.softmax(out)
+        out = out.permute(0, 2, 1)
+        # t5 = self.conv5_t_relu(self.conv5_t_bn(self.conv5_t(self.pad(torch.cat((lstm_out_real, e5), dim=1)))))
+        # t4 = self.conv4_t_relu(self.conv4_t_bn(self.conv4_t(self.pad(torch.cat((t5, e4), dim=1)))))
+        # t3 = self.conv3_t_relu(self.conv3_t_bn(self.conv3_t(self.pad(torch.cat((t4, e3), dim=1)))))
+        # t2 = self.conv2_t_relu(self.conv2_t_bn(self.conv2_t(self.pad(torch.cat((t3, e2), dim=1)))))
+        # t1 = self.conv1_t_relu(self.conv1_t(self.pad(torch.cat((t2, e1), dim=1))))
+
+        # out = torch.squeeze(t1, 1)
 
         # [30, 801]  --> [3, 160000]
 
-        return [out, MFCC_array]
+        return out
