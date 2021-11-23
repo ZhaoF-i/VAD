@@ -13,31 +13,44 @@ import torchaudio
 import numpy as np
 
 
-class FPCDataset(Dataset):
+class Dataset(Dataset):
     def __init__(self, mode='train'):
         super().__init__()
 
         # 数据集音频和标签地址
-        train_list = glob('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_wav/*.wav')
-        lab_train_list = glob('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_label/*.npy')
+        data_list = sorted(glob('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_wav/*.wav'))
+        lab_list = sorted(glob('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_label/*.npy'))
 
-        # x,y要匹配
-
-
-        # # 训练集or测试集
-        # if mode == 'validate':
-        #     tra_path = val_path
-        #     lab_tra_path = lab_val_path
+        # 数据比例
+        train_percent = 0.6
+        eval_percent = 0.1
+        test_percent = 0.3
+        len_data = len(data_list)
 
         # 初始化音频、标签和字典
         self.src, self.trg = [], []
 
-        pack = list(zip(train_list, lab_train_list))
+        pack = list(zip(data_list, lab_list))
+        shuffle(pack)
+
+        # 训练集or测试集
+        if mode == 'validate':
+            pack = pack[int(len_data * train_percent): int(len_data * (train_percent + eval_percent))]
+        elif mode == 'train':
+            # pack = pack[: int(len_data * train_percent)]
+            pack = pack[: int(10)]
+        else:
+            pack = pack[int(len_data * (train_percent + eval_percent)) :]
+
+
         # 读取音频和标签
         print('Read audio and labels:')
         for p,q in tqdm(pack):
             wav_data = read_audio(p)
-            label_dict = np.load(q, allow_pickle=True).item()
+            # wav_data = 1 / (np.sqrt(np.sum(wav_data.numpy()) ** 2) / (wav_data.size()[0] * wav_data.size()[1]) + 1e-7)
+
+            label_dict = np.load(q)
+            label_dict = np.minimum(label_dict, 2)
             self.src.append(wav_data)
             self.trg.append(label_dict)
 
@@ -48,7 +61,7 @@ class FPCDataset(Dataset):
         return len(self.src)
 
 
-class FPCDataLoader(object):
+class BatchDataLoader(object):
     def __init__(self, s_mix_dataset, batch_size, is_shuffle=True, workers_num=16):
         self.dataloader = DataLoader(s_mix_dataset, batch_size=batch_size, shuffle=is_shuffle,
                                      num_workers=workers_num, collate_fn=self.collate_fn)
@@ -61,19 +74,9 @@ class FPCDataLoader(object):
         batch.sort(key=lambda x: x[0].size()[0], reverse=True)
         wav, tag = zip(*batch)
 
-        # 左侧填充0使batch长度相同
-        wav_size = []
-        for i in wav:
-            wav_size.append(i.shape[0])
-        max_wav_size = max(wav_size)
         wav_pad = []
         for i, i_data in enumerate(wav):
-            zero_num = max_wav_size - wav_size[i]
-            if zero_num > 0:
-                zero = torch.zeros(zero_num)
-                wav_pad.append(torch.cat((zero, i_data), dim=0))
-            else:
-                wav_pad.append(i_data)
+            wav_pad.append(i_data)
 
         wav_batch = pad_sequence(wav_pad, batch_first=True)
 
@@ -82,11 +85,12 @@ class FPCDataLoader(object):
 
         # print(tag)
         return [wav_batch, tag_batch]
+        # return [wav, tag_batch]
 
 
 if __name__ == '__main__':
-    data_train = FPCDataset()
-    tr_batch_dataloader = FPCDataLoader(data_train, 32, is_shuffle=True, workers_num=8)
+    data_train = Dataset()
+    tr_batch_dataloader = BatchDataLoader(data_train, 32, is_shuffle=True, workers_num=8)
     for i_batch, batch_data in enumerate(tr_batch_dataloader.get_dataloader()):
         print(i_batch)  # 打印batch编号
         # print(batch_data[0])  # 打印该batch里面src （会死掉的）
