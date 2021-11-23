@@ -84,9 +84,9 @@ class NET_Wrapper(nn.Module):
             mel = self.Mel(input_data_c1[:, :, i])
             Mel_array.append(mel)
 
-        MFCC_array = torch.stack(tuple(MFCC_array), -1)
-        MFCC_array = MFCC_array.permute(0, 3, 1, 2)
-        input_feature = MFCC_array
+        Mel_array = torch.stack(tuple(Mel_array), -1)
+        Mel_array = Mel_array.permute(0, 3, 1, 2)
+        input_feature = Mel_array
 
         # e1 = self.conv1_relu(self.conv1_bn(self.conv1(self.pad(torch.stack([input_feature], 1)))))
         e1 = self.conv1_relu(self.conv1_bn(self.conv1(self.pad(input_feature))))
