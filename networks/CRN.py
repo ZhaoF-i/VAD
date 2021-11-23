@@ -14,7 +14,7 @@ class NET_Wrapper(nn.Module):
         self.win_len = win_len
         self.win_offset = win_offset
         super(NET_Wrapper, self).__init__()
-        self.lstm_input_size = 256 * 24
+        self.lstm_input_size = 256 * 30
         self.lstm_layers = 1
         self.conv1 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=(2, 3), stride=(1, 2))
         self.conv1_relu = nn.ELU()
@@ -72,7 +72,7 @@ class NET_Wrapper(nn.Module):
         self.pad = nn.ConstantPad2d((0, 0, 1, 0), value=0.)
         self.STFT = STFT(self.win_len, self.win_offset).cuda()
         self.MFCC = MFCC().cuda()
-        self.Mel = Mel(400, 160, True).cuda()
+        self.Mel = Mel(64 ,400, 160, True).cuda()
 
     def forward(self, input_data_c1):
         # input_data_c1 = train_info_.mix_feat_b
@@ -100,7 +100,7 @@ class NET_Wrapper(nn.Module):
         out_real = e5.contiguous().transpose(1, 2)
         out_real = out_real.contiguous().view(out_real.size(0), out_real.size(1), -1)
         lstm_out, _ = self.lstm(out_real)
-        lstm_out_real = lstm_out.contiguous().view(lstm_out.size(0), lstm_out.size(1), 256, 24)
+        lstm_out_real = lstm_out.contiguous().view(lstm_out.size(0), lstm_out.size(1), 256, 30)
         lstm_out_real = lstm_out_real.contiguous().transpose(1, 2)
 
         t5 = self.conv5_t_relu(self.conv5_t_bn(self.conv5_t(self.pad(torch.cat((lstm_out_real, e5), dim=1)))))

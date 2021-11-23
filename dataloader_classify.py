@@ -13,6 +13,25 @@ import torchaudio
 import numpy as np
 
 
+def frame_level_label(label_dict):
+    frame_level_label = []
+    label_dict = np.pad(label_dict, (200, 200), 'constant', constant_values=(0,0))
+
+    counts = np.bincount(label_dict[200: 400])
+    frame_level_label.append(np.argmax(counts))
+
+    index = 160
+    for i in range(1, int(label_dict.size / 160) - 2):
+        counts = np.bincount(label_dict[index: index+400])
+        index += 160
+        frame_level_label.append(np.argmax(counts))
+
+    counts = np.bincount(label_dict[index: index+200])
+    frame_level_label.append(np.argmax(counts))
+
+    return np.array(frame_level_label)
+
+
 class Dataset(Dataset):
     def __init__(self, mode='train'):
         super().__init__()
@@ -51,6 +70,7 @@ class Dataset(Dataset):
 
             label_dict = np.load(q)
             label_dict = np.minimum(label_dict, 2)
+            label_dict = frame_level_label(label_dict)
             self.src.append(wav_data)
             self.trg.append(label_dict)
 
