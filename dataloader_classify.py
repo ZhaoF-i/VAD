@@ -2,10 +2,9 @@ from torch import nn
 from torch.utils.data import Dataset, DataLoader
 from torch.nn.utils.rnn import *
 import torch
-from glob import glob
 from tqdm import tqdm
-from random import shuffle, sample, randint, choices
-from speechbrain.dataio.dataio import read_audio, write_audio
+import soundfile as sf
+from torch.autograd.variable import *
 
 import numpy as np
 import pickle, os
@@ -18,10 +17,10 @@ def frame_level_label(label_dict):
     counts = np.bincount(label_dict[200: 400])
     frame_level_label.append(np.argmax(counts))
 
-    index = 160
-    for i in range(1, int(label_dict.size / 160) - 2):
+    index = 200
+    for i in range(1, int(label_dict.size / 200) - 2):
         counts = np.bincount(label_dict[index: index+400])
-        index += 160
+        index += 200
         frame_level_label.append(np.argmax(counts))
 
     counts = np.bincount(label_dict[index: index+200])
@@ -33,64 +32,43 @@ def frame_level_label(label_dict):
 class Dataset(Dataset):
     def __init__(self, mode='train'):
         super().__init__()
-        self.src, self.trg = [], []
-
-        path = '/data01/zhaofei/data/VAD/' + mode + '_data.p'
-        if os.path.exists(path):
-            with open(path, 'rb') as f:
-                inp = pickle.load(f)
-                self.src = inp[0]
-                self.trg = inp[1]
-        else:
-            # 数据集音频和标签地址
-            data_list = sorted(glob('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_wav/*.wav'))
-            lab_list = sorted(glob('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_label/*.npy'))
-
-            # 数据比例
-            train_percent = 0.6
-            eval_percent = 0.1
-            test_percent = 0.3
-            len_data = len(data_list)
-
-            # 初始化音频、标签和字典
-
-            pack = list(zip(data_list, lab_list))
-            shuffle(pack)
-
-            # 训练集or测试集
-            if mode == 'validate':
-                pack = pack[int(len_data * train_percent): int(len_data * (train_percent + eval_percent))]
-            elif mode == 'train':
-                pack = pack[: int(len_data * train_percent)]
-                # pack = pack[: int(10)]
-            else:
-                pack = pack[int(len_data * (train_percent + eval_percent)):]
-
-            # 读取音频和标签
-            print('Read audio and labels:')
-            for p, q in tqdm(pack):
-                wav_data = read_audio(p)
-                alpha_pow = 1 / (
-                            np.sqrt(np.sum(wav_data.numpy()) ** 2) / (wav_data.size()[0] * wav_data.size()[1]) + 1e-7)
-                wav_data *= alpha_pow
-                # np.sum(wav_data) ** 2
-
-                label_dict = np.load(q)
-                label_dict = np.minimum(label_dict, 2)
-                label_dict = frame_level_label(label_dict)
-                self.src.append(wav_data)
-                self.trg.append(label_dict)
-
-            with open(path, 'wb') as f:
-                pickle.dump((self.src, self.trg), f, pickle.HIGHEST_PROTOCOL)
-
-
-
+        self.lst=np.load("./"+mode+".npy",allow_pickle=True)
+        self.mode=mode
     def __getitem__(self, index):
-        return self.src[index], self.trg[index]
+        wav,_=sf.read(str(self.lst[index]))
+        alpha_pow = 1 / (
+                np.sqrt(np.sum(wav** 2)) / (wav.size) + 1e-7)
+        wav=wav*alpha_pow
+        if self.mode=='train':
+            label=np.load('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_label/'+self.lst[index].stem+'.npy')
+        else:
+            label=np.load('/data01/spj/asr_dataset/ai_shell4_vad/TEST/seg_label/'+self.lst[index].stem+'.npy')
+        label=np.minimum(label, 2)
+        label=frame_level_label(label)
+        # for p, q in tqdm(pack):
+        #     wav_data = read_audio(p)
+        #
+        #     wav_data *= alpha_pow
+        #
+        #
+        #     label_dict = np.load(q)
+        #     label_dict = np.minimum(label_dict, 2)
+        #     label_dict = frame_level_label(label_dict)
+        #     self.src.append(wav_data)
+        #     self.trg.append(label_dict)
+
+        # with open(path, 'wb') as f:
+        #     pickle.dump((self.src, self.trg), f, pickle.HIGHEST_PROTOCOL)
+
+        sample=(
+            Variable(torch.FloatTensor(wav.astype('float32'))),
+            Variable(torch.FloatTensor(label.astype('float32'))),
+            alpha_pow
+        )
+        return sample
 
     def __len__(self):
-        return len(self.src)
+        return len(self.lst)
 
 
 class BatchDataLoader(object):
@@ -104,19 +82,18 @@ class BatchDataLoader(object):
     @staticmethod
     def collate_fn(batch):
         batch.sort(key=lambda x: x[0].size()[0], reverse=True)
-        wav, tag = zip(*batch)
+        wav, tag,alpha_pow = zip(*batch)
 
-        wav_pad = []
-        for i, i_data in enumerate(wav):
-            wav_pad.append(i_data)
+        # wav_pad = []
+        # for i, i_data in enumerate(wav):
+        #     wav_pad.append(i_data)
 
-        wav_batch = pad_sequence(wav_pad, batch_first=True)
+        wav_batch = pad_sequence(wav, batch_first=True)
+        tag_batch=pad_sequence(tag,batch_first=True)
 
-        tag_batch = np.array(tag).astype(int)
-        tag_batch = torch.from_numpy(tag_batch)
 
         # print(tag)
-        return [wav_batch, tag_batch]
+        return [wav_batch, tag_batch,alpha_pow]
         # return [wav, tag_batch]
 
 

@@ -31,7 +31,8 @@ class NET_Wrapper(nn.Module):
         self.lstm = nn.LSTM(input_size=self.lstm_input_size,
                             hidden_size=self.lstm_input_size,
                             num_layers=self.lstm_layers,
-                            batch_first=True)
+                            batch_first=True,
+                            bidirectional=True)
 
         self.conv2d_1 = nn.Conv2d(in_channels=64, out_channels=3, kernel_size=(1,1))
         self.Aver_pooling = nn.AvgPool2d((1, 7))
@@ -75,7 +76,6 @@ class NET_Wrapper(nn.Module):
         self.conv2_t_bn = nn.BatchNorm2d(16)
         self.conv1_t_bn = nn.BatchNorm2d(8)
         self.pad = nn.ConstantPad2d((0, 0, 1, 0), value=0.)
-        self.pad1 = nn.ConstantPad2d((0, 0, 0, 2), value=0.)
         self.STFT = STFT(self.win_len, self.win_offset).cuda()
         self.MFCC = MFCC().cuda()
         self.Mel = Mel(64 ,400, 160, True).cuda()
