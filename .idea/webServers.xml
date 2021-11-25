@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="ed627162-8e95-4e5f-8b4f-89bde61e6c38" name="imuspeech">
+        <fileTransfer rootFolder="/home/imu_speech1/zhaofei/" accessType="SFTP" host="183.175.12.106" port="22" sshConfigId="27a99d87-12e9-4a4b-ad8b-f8e17f086d89" sshConfig="imu_speech1@183.175.12.106:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

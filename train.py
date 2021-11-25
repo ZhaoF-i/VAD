@@ -20,9 +20,8 @@ wandb.init(project="VAD", entity="zhaofei")
 wandb.config = {
   "learning_rate": 0.001,
   "epochs": 15,
-  "batch_size": 32
+  "batch_size": 8
 }
-
 
 def validate(network, eval_loader, weight, *criterion):
     network.eval()

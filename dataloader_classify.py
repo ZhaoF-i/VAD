@@ -39,10 +39,8 @@ class Dataset(Dataset):
         alpha_pow = 1 / (
                 np.sqrt(np.sum(wav** 2)) / (wav.size) + 1e-7)
         wav=wav*alpha_pow
-        if self.mode=='train':
-            label=np.load('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_label/'+self.lst[index].stem+'.npy')
-        else:
-            label=np.load('/data01/spj/asr_dataset/ai_shell4_vad/TEST/seg_label/'+self.lst[index].stem+'.npy')
+
+        label=np.load('/data01/spj/ai_shell4_vad/TRAIN/seg_label/'+self.lst[index].stem+'.npy')
         label=np.minimum(label, 2)
         label=frame_level_label(label)
         # for p, q in tqdm(pack):
@@ -62,7 +60,7 @@ class Dataset(Dataset):
 
         sample=(
             Variable(torch.FloatTensor(wav.astype('float32'))),
-            Variable(torch.FloatTensor(label.astype('float32'))),
+            Variable(torch.tensor(label.astype('int64'))),
             alpha_pow
         )
         return sample
@@ -91,8 +89,6 @@ class BatchDataLoader(object):
         wav_batch = pad_sequence(wav, batch_first=True)
         tag_batch=pad_sequence(tag,batch_first=True)
 
-
-        # print(tag)
         return [wav_batch, tag_batch,alpha_pow]
         # return [wav, tag_batch]
 

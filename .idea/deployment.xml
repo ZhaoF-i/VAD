@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="ZhaoFei@183.175.12.36:22 password" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
+  <component name="PublishConfigData" autoUpload="Always" serverName="imu_speech1@183.175.12.106:22 password" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true" showAutoUploadSettingsWarning="false">
     <serverData>
       <paths name="ZhaoFei@183.175.12.36:22 password">
         <serverdata>
@@ -16,6 +16,21 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="imu_speech1@183.175.12.106:22 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/imu_speech1/zhaofei/VAD" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="imuspeech">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/VAD" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
     </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>
