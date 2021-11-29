@@ -1,0 +1,8 @@
+网络：
+    TDNN
+    ResNet+BiLSTM
+
+loss：
+    amsoftmax
+
+其他：

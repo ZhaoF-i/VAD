@@ -1,0 +1,13 @@
+
+Read audio and labels:
+  0%|                                                 | 0/77515 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/home/ZhangXueLiang/ZhaoFei/.pycharm_helpers/pydev/pydevd.py", line 1483, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/home/ZhangXueLiang/ZhaoFei/.pycharm_helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/home/ZhangXueLiang/ZhaoFei/PycharmProject/VAD/train.py", line 86, in <module>
+    tr_mix_dataset = FPCDataset(mode='train')
+  File "/home/ZhangXueLiang/ZhaoFei/PycharmProject/VAD/dataloader_classify.py", line 40, in __init__
+    label_dict = np.load(q, allow_pickle=True).item()
+ValueError: can only convert an array of size 1 to a Python scalar
