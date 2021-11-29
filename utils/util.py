@@ -4,6 +4,29 @@ import re
 import torch
 from torch.autograd import Variable
 
+def one_hot(input, n_class):
+    one_hot = torch.zeros(len(input), n_class)
+    label_one_hot = one_hot.scatter(1, input, 1)
+    return label_one_hot
+
+def frame_level_label(label_dict, frame_len, frame_shift):
+    frame_level_label = []
+    label_dict = np.pad(label_dict, (frame_shift, frame_shift), 'constant', constant_values=(0,0))
+
+    counts = np.bincount(label_dict[frame_shift: frame_len])
+    frame_level_label.append(np.argmax(counts))
+
+    index = frame_shift
+    for i in range(1, int(label_dict.size / frame_shift) - 2):
+        counts = np.bincount(label_dict[index: index+frame_len])
+        index += frame_shift
+        frame_level_label.append(np.argmax(counts))
+
+    counts = np.bincount(label_dict[index: index+frame_shift])
+    frame_level_label.append(np.argmax(counts))
+
+    return np.array(frame_level_label)
+
 def expandWindow(data, left, right):
     data = data.detach().cpu().numpy()
     sp = data.shape
@@ -39,6 +62,8 @@ def gen_list(wav_dir, append):
         if re.search(append, f):
             l.append(f)
     return l
+
+
 
 def write_log(file,name, train, validate):
     message = ''

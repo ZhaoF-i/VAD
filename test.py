@@ -6,15 +6,18 @@ import logging as log
 
 from pathlib import Path
 from torch import nn
-from metrics import Metrics
+from metrics_classify import Metrics
+# from metrics import Metrics
 from networks.CRN import NET_Wrapper
 from utils.Checkpoint import Checkpoint
 from utils.progressbar import progressbar as pb
 from utils.stft_istft import STFT
 from utils.util import makedirs, gen_list
 from torch.autograd.variable import *
+import numpy as np
+from utils.util import frame_level_label
 
-
+# /data01/spj/exp_result/VAD/baseline_VAD/checkpoints
 class Test(object):
     def __init__(self, inpath, outpath, type='online', suffix='mix.wav'):
         self.inpath = inpath
@@ -25,33 +28,35 @@ class Test(object):
 
     def forward(self, network):
         network.eval()
-        tt_lst = gen_list(self.inpath, self.suffix)
+        # tt_lst = gen_list(self.inpath + '/seg_wav', self.suffix)
+        tt_lst = os.listdir(self.inpath + 'seg_wav')
+        tt_lst.sort()
+        test_label_lst = os.listdir(self.inpath + 'seg_label')
+        test_label_lst.sort()
         tt_len = len(tt_lst)
         pbar = pb(0, tt_len)
         pbar.start()
         for i in range(tt_len):
-            pbar.update_progress(i, 'tt', '')
-            mix, fs = sf.read(self.inpath + '/' + tt_lst[i])
+            pbar.update_progress(i, 'test', '')
+            mix, fs = sf.read(self.inpath + 'seg_wav/' + tt_lst[i])
+            alpha_pow = 1 / (np.sqrt(np.sum(mix ** 2)) / (mix.size) + 1e-7)
+            mix = mix * alpha_pow
             mixture = Variable(torch.FloatTensor(mix.astype('float32')))
-            len_speech = len(mixture)
-            alpha = 1 / torch.sqrt(torch.sum(mixture ** 2) / len_speech)
-            mixture = mixture * alpha
-            mixture = mixture.reshape([1, -1])
+            mixture = mixture.unsqueeze(0)
+
 
             """------------------------------------modify  area------------------------------------"""
             with torch.no_grad():
                 est = network(mixture)
-            real = est[0] * torch.cos(est[2].permute(0, 2, 1))
-            imag = est[0] * torch.sin(est[2].permute(0, 2, 1))
-            est_speech = self.STFT.inverse(torch.stack([real, imag], 3))
-            est = est_speech[0].data.cpu().numpy()
+            est = est.cpu().numpy()
             """------------------------------------modify  area------------------------------------"""
-            if self.type == 'online':
-                clean_name = tt_lst[i][:-7] + 'clean.wav'
-                clean, _ = sf.read(self.inpath + '/' + clean_name)
-                sf.write(self.outpath + tt_lst[i][:-len(self.suffix) - 1] + '_clean.wav', clean[:est.size], fs)
-            sf.write(self.outpath + tt_lst[i][:-len(self.suffix) - 1] + '_est.wav', est / alpha, fs)
-            sf.write(self.outpath + tt_lst[i][:-len(self.suffix) - 1] + '_mix.wav', mix[:est.size], fs)
+
+            path = tt_lst[i].split('.')[0]
+            np.save(self.outpath + path + '.npy', est)
+            test_label = np.load(self.inpath + 'seg_label/' + test_label_lst[i])
+            # test_label = frame_level_label(test_label)
+            np.save(self.outpath + path + '_label.npy', test_label)
+
 
         pbar.finish()
 
@@ -79,7 +84,7 @@ if __name__ == '__main__':
     _outpath = config['OUTPUT_DIR'] + _project + config['WORKSPACE']
     # if offline test
     # _outpath = config['OFFLINE_TEST_DIR'] + _project + config['WORKSPACE']
-    outpath = _outpath + '/estimations/'
+    outpath = _outpath + '/estimations_1-200-val/'
     makedirs([outpath])
 
     os.environ["CUDA_VISIBLE_DEVICES"] = config['CUDA_ID']

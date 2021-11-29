@@ -74,3 +74,11 @@ class sisdr_loss(object):
         Snn = (e_res ** 2).sum()
         sisdr = 10 * torch.log10((self.EPSILON + Sss) / (self.EPSILON + Snn))
         return sisdr
+
+class crossentropy_loss(object):
+    def __init__(self):
+        self.weight=torch.tensor([10,1.25,10]).cuda()
+        self.CrossEntropyLoss=torch.nn.CrossEntropyLoss(weight=self.weight)
+
+    def __call__(self, est, data_info):
+        return self.CrossEntropyLoss(est,data_info)

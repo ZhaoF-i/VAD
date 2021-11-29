@@ -7,21 +7,23 @@ import torch.nn as nn
 import logging as log
 import wandb
 
+
 from pathlib import Path
 from criteria import *
 # from dataloader import BatchDataLoader, SpeechMixDataset
-from dataloader_classify import *
+from dataloader_VAD_multi_channel import *
 from utils.Checkpoint import Checkpoint
-from networks.CRN import NET_Wrapper
+from networks.CRN_multi_channel_complex import NET_Wrapper
 from utils.progressbar import progressbar as pb
 from utils.util import makedirs, saveYAML
 
-wandb.init(project="VAD", entity="zhaofei")
-wandb.config = {
-  "learning_rate": 0.001,
-  "epochs": 15,
-  "batch_size": 8
-}
+
+# wandb.init(project="VAD", entity="zhaofei")
+# wandb.config = {
+#   "learning_rate": 0.001,
+#   "epochs": 15,
+#   "batch_size": 8
+# }
 
 def validate(network, eval_loader, weight, *criterion):
     network.eval()
@@ -35,7 +37,7 @@ def validate(network, eval_loader, weight, *criterion):
             outputs = network(features)
             loss = 0.
             for idx, cri in enumerate(criterion):
-                loss += cri(outputs, batch_eval) * weight[idx]
+                loss += cri(outputs, labels) * weight[idx]
             eval_loss = loss.data.item()
             accu_eval_loss += eval_loss
 
@@ -102,7 +104,8 @@ if __name__ == '__main__':
     lr_list = [0.0002] * 3 + [0.0001] * 6 + [0.00005] * 3 + [0.00001] * 3
     #  criteria,weight for each criterion
     # criterion = mag_loss(config['WIN_LEN'], config['WIN_OFFSET'], loss_type='mse')
-    criterion = nn.CrossEntropyLoss()
+
+    criterion = crossentropy_loss()
     weight = [1.]
 
     if args.model_name == 'none':
@@ -157,8 +160,8 @@ if __name__ == '__main__':
                                                                                       config['MAX_EPOCH'], running_loss,
                                                                                       accu_train_loss / cnt))
 
-            wandb.log({"train_loss": running_loss})
-            wandb.log({"avg_train_loss": accu_train_loss / cnt})
+            # wandb.log({"train_loss": running_loss})
+            # wandb.log({"avg_train_loss": accu_train_loss / cnt})
 
             if config['USE_CV'] and (i + 1) % config['EVAL_STEP'] == 0:
                 print()
