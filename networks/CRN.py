@@ -17,7 +17,7 @@ class NET_Wrapper(nn.Module):
         super(NET_Wrapper, self).__init__()
         self.lstm_input_size = 64 * 7
         self.lstm_layers = 2
-        self.conv1 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=(2, 3), stride=(1, 2))
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=(2, 3), stride=(1, 2))
         self.conv1_relu = nn.ELU()
         self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(2, 3), stride=(1, 2))
         self.conv2_relu = nn.ELU()
@@ -53,8 +53,8 @@ class NET_Wrapper(nn.Module):
         # self.Mel = Mel(64 ,400, 200, False).cuda()
 
     def forward(self, input_data_c1):
-
-        input = input_data_c1.permute(0, 2, 1)
+        input=input_data_c1.unsqueeze(1)
+        # input = input_data_c1.permute(0, 2, 1)
         mel_feature = self.mel(input)
         # mel_feature=mel_feature.unsqueeze(1)
         input_feature = mel_feature.permute(0, 1, 3, 2)
