@@ -1,0 +1,7 @@
+network: CRN
+input: multi_channel complex
+
+best:
+    loss: 0.6959
+    score: 平均帧错误数 168.3939
+    	   平均帧错误率 16.8225 %

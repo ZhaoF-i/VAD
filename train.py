@@ -103,7 +103,7 @@ if __name__ == '__main__':
     parameters = sum(p.numel() for p in network.parameters() if p.requires_grad)
     print("Trainable parameters : " + str(parameters))
     optimizer = torch.optim.Adam(network.parameters(), lr=config['LR'], amsgrad=True)
-    lr_list = [0.0002] * 3 + [0.0001] * 6 + [0.00005] * 3 + [0.00001] * 3 + [0.00001] * 35
+    lr_list = [0.0002] * 3 + [0.0001] * 6 + [0.00005] * 3 + [0.00001] * 3
     #  criteria,weight for each criterion
     # criterion = mag_loss(config['WIN_LEN'], config['WIN_OFFSET'], loss_type='mse')
 
@@ -130,8 +130,8 @@ if __name__ == '__main__':
     cnt = 0.  #
     for epoch in range(start_epoch, config['MAX_EPOCH']):
         # set learning rate for every epoch
-        for param_group in optimizer.param_groups:
-            param_group['lr'] = lr_list[epoch]
+        # for param_group in optimizer.param_groups:
+        #     param_group['lr'] = lr_list[epoch]
 
         # initial param
         accu_train_loss = 0.0
