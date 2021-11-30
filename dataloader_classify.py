@@ -23,7 +23,7 @@ class Dataset(Dataset):
         label=np.load('/data01/spj/ai_shell4_vad/TRAIN/seg_label/'+self.lst[index].stem+'.npy')
         # label=np.load('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_label/'+self.lst[index].stem+'.npy')
         label=np.minimum(label, 2)
-        label=frame_level_label(label, frame_len=320, frame_shift=160)
+        label=frame_level_label(label, frame_len=400, frame_shift=200)
 
         sample=(
             Variable(torch.FloatTensor(wav.astype('float32'))),

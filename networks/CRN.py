@@ -45,7 +45,7 @@ class NET_Wrapper(nn.Module):
         self.conv3_bn = nn.BatchNorm2d(64)
 
         self.pad = nn.ConstantPad2d((0, 0, 1, 0), value=0.)
-        self.Spec = torchaudio.transforms.Spectrogram(n_fft=320, power=None)
+        self.Spec = torchaudio.transforms.Spectrogram(n_fft=400, power=None)
 
 
     def forward(self, input_data_c1):
