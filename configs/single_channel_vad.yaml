@@ -34,4 +34,4 @@ BEST_MODEL: 'best.ckpt'                                                       # 
 MID_MODEL: 'val.ckpt'                                                         # 默认中间模型名称
 SAVE_BEST_ONLY: False                                                         # [True,False]:[仅保存最好的模型,保存中间模型]
 #WORKSPACE: '/VAD-baseline_diff_loss_single_channel_mel'                                                        # 子项目名称
-WORKSPACE: '/VAD-baseline_diff_loss_multi_channel_complex'                                                        # 子项目名称
+WORKSPACE: '/VAD-baseline_diff_loss_single_channel_mel_50epoch'                                                        # 子项目名称
