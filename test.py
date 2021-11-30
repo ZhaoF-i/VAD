@@ -17,7 +17,7 @@ from torch.autograd.variable import *
 import numpy as np
 from utils.util import frame_level_label
 
-# /data01/spj/exp_result/VAD/baseline_VAD/checkpoints
+
 class Test(object):
     def __init__(self, inpath, outpath, type='online', suffix='mix.wav'):
         self.inpath = inpath
@@ -39,6 +39,7 @@ class Test(object):
         for i in range(tt_len):
             pbar.update_progress(i, 'test', '')
             mix, fs = sf.read(self.inpath + 'seg_wav/' + tt_lst[i])
+            mix = mix[:,0]
             alpha_pow = 1 / (np.sqrt(np.sum(mix ** 2)) / (mix.size) + 1e-7)
             mix = mix * alpha_pow
             mixture = Variable(torch.FloatTensor(mix.astype('float32')))
@@ -84,7 +85,7 @@ if __name__ == '__main__':
     _outpath = config['OUTPUT_DIR'] + _project + config['WORKSPACE']
     # if offline test
     # _outpath = config['OFFLINE_TEST_DIR'] + _project + config['WORKSPACE']
-    outpath = _outpath + '/estimations_1-200-val/'
+    outpath = _outpath + '/estimations_best/'
     makedirs([outpath])
 
     os.environ["CUDA_VISIBLE_DEVICES"] = config['CUDA_ID']

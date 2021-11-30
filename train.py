@@ -11,9 +11,11 @@ import wandb
 from pathlib import Path
 from criteria import *
 # from dataloader import BatchDataLoader, SpeechMixDataset
-from dataloader_VAD_multi_channel import *
+# from dataloader_VAD_multi_channel import *
+from dataloader_classify import *
 from utils.Checkpoint import Checkpoint
-from networks.CRN_multi_channel_complex import NET_Wrapper
+# from networks.CRN_multi_channel_complex import NET_Wrapper
+from networks.CRN import NET_Wrapper
 from utils.progressbar import progressbar as pb
 from utils.util import makedirs, saveYAML
 
@@ -101,7 +103,7 @@ if __name__ == '__main__':
     parameters = sum(p.numel() for p in network.parameters() if p.requires_grad)
     print("Trainable parameters : " + str(parameters))
     optimizer = torch.optim.Adam(network.parameters(), lr=config['LR'], amsgrad=True)
-    lr_list = [0.0002] * 3 + [0.0001] * 6 + [0.00005] * 3 + [0.00001] * 3
+    lr_list = [0.0002] * 3 + [0.0001] * 6 + [0.00005] * 3 + [0.00001] * 3 + [0.00001] * 35
     #  criteria,weight for each criterion
     # criterion = mag_loss(config['WIN_LEN'], config['WIN_OFFSET'], loss_type='mse')
 
