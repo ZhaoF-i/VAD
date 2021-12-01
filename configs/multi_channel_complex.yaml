@@ -7,13 +7,13 @@ LR: 0.001                                                                     # 
 MAX_EPOCH: 50                                                                 # 训练轮数
 EPSILON: 0.0000001                                                            #
 USE_CV: True                                                                  # [True,False]，是否使用验证集
-EVAL_STEP: 400                                                               # 多少个batch进行一次CV
+EVAL_STEP: 800                                                               # 多少个batch进行一次CV
 LOG_STEP: 500                                                                 # 多少个batch输出一次信息
 
 
 # server setting
-CUDA_ID: '1'                                                                  # 指定GPU编号
-BATCH_SIZE: 32                                                             # 批处理数
+CUDA_ID: '0'                                                                  # 指定GPU编号
+BATCH_SIZE: 8                                                             # 批处理数
 NUM_WORK: 16                                                                   # 线程数
 
 

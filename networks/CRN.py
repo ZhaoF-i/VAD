@@ -13,7 +13,7 @@ class NET_Wrapper(nn.Module):
         self.win_len = win_len
         self.win_offset = win_offset
         super(NET_Wrapper, self).__init__()
-        self.lstm_input_size = 64 * 19
+        self.lstm_input_size = 64 * 24
         self.lstm_layers = 2
         self.conv1 = nn.Conv2d(in_channels=16, out_channels=16, kernel_size=(2, 3), stride=(1, 2))
         self.conv1_relu = nn.ELU()
@@ -33,7 +33,7 @@ class NET_Wrapper(nn.Module):
                             batch_first=True,
                             bidirectional=True)
 
-        self.Aver_pooling = nn.AvgPool2d((1, 19))
+        self.Aver_pooling = nn.AvgPool2d((1, 24))
         self.linear_layer = nn.Sequential(nn.Linear(128, 3),
                                           nn.Dropout(0.5),
                                           nn.LeakyReLU())
