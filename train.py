@@ -194,8 +194,8 @@ if __name__ == '__main__':
 
 
 
-    timeit = time.strftime('%Y-%m-%d-%H_', time.localtime(time.time()))
-    log_path = str(_abspath) + '/train.log'
-    if os.path.exists(log_path):
-        shutil.copy(log_path, _outpath + '/log/' + timeit + 'train.log')
-        file = open(log_path, 'w').close()
+    # timeit = time.strftime('%Y-%m-%d-%H_', time.localtime(time.time()))
+    # log_path = str(_abspath) + '/train.log'
+    # if os.path.exists(log_path):
+    #     shutil.copy(log_path, _outpath + '/log/' + timeit + 'train.log')
+    #     file = open(log_path, 'w').close()
