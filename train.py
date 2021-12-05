@@ -82,9 +82,9 @@ if __name__ == '__main__':
     saveYAML(config, _outpath + '/' + args.yaml_name)
 
     # log set
-    log.basicConfig(filename=_logdir + 'train.log',
-                    format='%(asctime)s:  %(message)s'
-                    , level=log.DEBUG, filemode='a', datefmt='%Y-%m-%d  %I:%M:%S %p')
+    # log.basicConfig(filename=_logdir + 'train.log',
+    #                 format='%(asctime)s:  %(message)s'
+    #                 , level=log.DEBUG, filemode='a', datefmt='%Y-%m-%d  %I:%M:%S %p')
 
     """
     network part
@@ -194,8 +194,8 @@ if __name__ == '__main__':
 
 
 
-    # timeit = time.strftime('%Y-%m-%d-%H_', time.localtime(time.time()))
-    # log_path = str(_abspath) + '/train.log'
-    # if os.path.exists(log_path):
-    #     shutil.copy(log_path, _outpath + '/log/' + timeit + 'train.log')
-    #     file = open(log_path, 'w').close()
+    timeit = time.strftime('%Y-%m-%d-%H_', time.localtime(time.time()))
+    log_path = str(_abspath) + '/train.log'
+    if os.path.exists(log_path):
+        shutil.copy(log_path, _outpath + '/log/' + timeit + 'train.log')
+        file = open(log_path, 'w').close()
