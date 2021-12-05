@@ -11,10 +11,8 @@ import wandb
 from pathlib import Path
 from criteria import *
 # from dataloader import BatchDataLoader, SpeechMixDataset
-# from dataloader_VAD_multi_channel import *
 from dataloader_classify import *
 from utils.Checkpoint import Checkpoint
-# from networks.CRN_multi_channel_complex import NET_Wrapper
 from networks.CRN import NET_Wrapper
 from utils.progressbar import progressbar as pb
 from utils.util import makedirs, saveYAML
@@ -82,9 +80,9 @@ if __name__ == '__main__':
     saveYAML(config, _outpath + '/' + args.yaml_name)
 
     # log set
-    log.basicConfig(filename=_logdir + 'train.log',
-                    format='%(asctime)s:  %(message)s'
-                    , level=log.DEBUG, filemode='a', datefmt='%Y-%m-%d  %I:%M:%S %p')
+    # log.basicConfig(filename=_logdir + 'train.log',
+    #                 format='%(asctime)s:  %(message)s'
+    #                 , level=log.DEBUG, filemode='a', datefmt='%Y-%m-%d  %I:%M:%S %p')
 
     """
     network part
