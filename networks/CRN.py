@@ -49,7 +49,7 @@ class NET_Wrapper(nn.Module):
         self.pad = nn.ConstantPad2d((0, 0, 1, 0), value=0.)
 
         # self.STFT = STFT(self.win_len, self.win_offset).cuda()
-        self.mel = torchaudio.transforms.MelSpectrogram(n_mels=64)
+        self.mel = torchaudio.transforms.MelSpectrogram(n_mels=64, n_fft=320)
         # self.Mel = Mel(64 ,400, 200, False).cuda()
 
     def forward(self, input_data_c1):
