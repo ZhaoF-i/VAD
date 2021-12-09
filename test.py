@@ -39,7 +39,7 @@ class Test(object):
         for i in range(tt_len):
             pbar.update_progress(i, 'test', '')
             mix, fs = sf.read(self.inpath + 'seg_wav/' + tt_lst[i])
-            mix = mix[:,0]
+            # mix = mix[:,0]
             alpha_pow = 1 / (np.sqrt(np.sum(mix ** 2)) / (mix.size) + 1e-7)
             mix = mix * alpha_pow
             mixture = Variable(torch.FloatTensor(mix.astype('float32')))
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     _outpath = config['OUTPUT_DIR'] + _project + config['WORKSPACE']
     # if offline test
     # _outpath = config['OFFLINE_TEST_DIR'] + _project + config['WORKSPACE']
-    outpath = _outpath + '/estimations'
+    outpath = _outpath + '/estimations/'
     makedirs([outpath])
 
     os.environ["CUDA_VISIBLE_DEVICES"] = config['CUDA_ID']
