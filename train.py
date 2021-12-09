@@ -7,7 +7,7 @@ import torch.nn as nn
 import logging as log
 import wandb
 
-
+import utils.log as logger
 from pathlib import Path
 from criteria import *
 # from dataloader import BatchDataLoader, SpeechMixDataset
@@ -82,9 +82,7 @@ if __name__ == '__main__':
     saveYAML(config, _outpath + '/' + args.yaml_name)
 
     # log set
-    # log.basicConfig(filename=_logdir + 'train.log',
-    #                 format='%(asctime)s:  %(message)s'
-    #                 , level=log.DEBUG, filemode='a', datefmt='%Y-%m-%d  %I:%M:%S %p')
+    logger.log(_logdir)
 
     """
     network part

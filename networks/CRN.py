@@ -37,8 +37,8 @@ class NET_Wrapper(nn.Module):
         self.linear_layer = nn.Sequential(nn.Linear(128, 3),
                                           nn.Dropout(0.5),
                                           nn.LeakyReLU())
-        self.softmax = nn.Softmax(dim=2)
-
+        # self.softmax = nn.Softmax(dim=2)
+        self.sigmoid = nn.Sigmoid()
 
         self.conv1_bn = nn.BatchNorm2d(16)
         self.conv2_bn = nn.BatchNorm2d(32)
@@ -73,7 +73,7 @@ class NET_Wrapper(nn.Module):
         out = out.permute(0, 2, 1)                # B, 1001, 128
 
         out = self.linear_layer(out)              # B, 1001, 3
-        out = self.softmax(out)
+        out = self.sigmoid(out)
         out = out.permute(0, 2, 1)                # B, 3, 1001
 
 
