@@ -39,6 +39,7 @@ class Metrics(object):
                 est_lst.append(est[0,:,j].argmax())
 
             est_lst = np.array(est_lst)
+            groud = groud.numpy()
 
             frame_error = np.sum(est_lst!=groud)
             total_error_lst.append(frame_error)
