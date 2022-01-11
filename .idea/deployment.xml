@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="imu_speech1@183.175.12.106:22 password" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true" showAutoUploadSettingsWarning="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="ZhaoFei@localhost:9007 password" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true" showAutoUploadSettingsWarning="false">
     <serverData>
       <paths name="ZhaoFei@183.175.12.36:22 password">
         <serverdata>
@@ -12,7 +12,7 @@
       <paths name="ZhaoFei@localhost:9007 password">
         <serverdata>
           <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/PycharmProject/VAD/Alimeeting_VAD" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
