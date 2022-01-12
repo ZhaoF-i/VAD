@@ -124,6 +124,7 @@ if __name__ == '__main__':
         optimizer.load_state_dict(checkpoint.optimizer)
         log.info('#' * 18 + 'Finish Resume Model ' + '#' * 18)
 
+    timeit = time.strftime('%Y-%m-%d-%H_', time.localtime(time.time()))
     """
     training part
     """
@@ -188,10 +189,8 @@ if __name__ == '__main__':
                 network.train()
                 cnt = 0.
 
-
-
-    timeit = time.strftime('%Y-%m-%d-%H_', time.localtime(time.time()))
-    log_path = str(_abspath) + '/train.log'
+    # timeit = time.strftime('%Y-%m-%d-%H_', time.localtime(time.time()))
+    log_path = _outpath + '/log/train.log'
     if os.path.exists(log_path):
         shutil.copy(log_path, _outpath + '/log/' + timeit + 'train.log')
         file = open(log_path, 'w').close()
