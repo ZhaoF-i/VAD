@@ -79,4 +79,4 @@ class NET_Wrapper(nn.Module):
         out = out.permute(0, 2, 1)
 
 
-        return out  # 8, 3, 801
+        return out  # batch_size, classify, frame

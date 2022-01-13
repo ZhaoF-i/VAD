@@ -18,11 +18,11 @@ class Dataset(Dataset):
     def __getitem__(self, index):
         wav,_=sf.read(str(self.lst[index]))
         wav=wav[:,0]
-        alpha_pow = 1 / (np.sqrt(np.sum(wav** 2)) / (wav.size) + 1e-7)
+        alpha_pow = 1 / ((np.sqrt(np.sum(wav** 2)) / ((wav.size) + 1e-7)) + 1e-7)
         wav=wav*alpha_pow
 
         # label=np.load('/data01/spj/ai_shell4_vad/TRAIN/seg_label/'+self.lst[index].stem+'.npy')
-        label=np.load('/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_label/'+self.lst[index].stem+'.npy')
+        label=np.load('/data01/zhaofei/data/asr_dataset/ai_shell4_vad/TRAIN/seg_label/'+self.lst[index].stem+'.npy')
         label=np.minimum(label, 2)
         label=frame_level_label(label, 400, 200)
 
