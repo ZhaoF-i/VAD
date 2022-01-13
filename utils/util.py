@@ -3,6 +3,7 @@ import os
 import re
 import torch
 from torch.autograd import Variable
+import torch.nn.functional as F
 
 def one_hot(input, n_class):
     one_hot = torch.zeros(len(input), n_class)
@@ -10,22 +11,36 @@ def one_hot(input, n_class):
     return label_one_hot
 
 def frame_level_label(label_dict, frame_len, frame_shift):
-    frame_level_label = []
-    label_dict = np.pad(label_dict, (frame_shift, frame_shift), 'constant', constant_values=(0,0))
+    label_dict = np.pad(label_dict, (frame_shift, frame_shift), 'symmetric')
+    input = torch.Tensor(label_dict).unsqueeze(0).unsqueeze(0)
+    kernel = torch.ones(frame_len).unsqueeze(0).unsqueeze(0)
+    torch_label = F.conv1d(input=input, weight=kernel, stride=frame_shift)
+    torch_label = torch_label.squeeze()
+    half = torch.ones(len(torch_label)) / 2  # + 0.00001
+    torch_label /= frame_len
 
-    counts = np.bincount(label_dict[frame_shift: frame_len])
-    frame_level_label.append(np.argmax(counts))
+    torch_frame_label = torch_label + half
+    torch_out = torch.as_tensor(torch_frame_label, dtype=torch.int64)
 
-    index = frame_shift
-    for i in range(1, int(label_dict.size / frame_shift) - 2):
-        counts = np.bincount(label_dict[index: index+frame_len])
-        index += frame_shift
-        frame_level_label.append(np.argmax(counts))
+    # frame_level_label = []
+    # counts = np.bincount(label_dict[frame_shift: frame_len])
+    # frame_level_label.append(np.argmax(counts))
+    #
+    # index = frame_shift
+    # for i in range(1, int(label_dict.size / frame_shift) - 2):
+    #     counts = np.bincount(label_dict[index: index+frame_len])
+    #     index += frame_shift
+    #     frame_level_label.append(np.argmax(counts))
+    #
+    # counts = np.bincount(label_dict[index: index+frame_shift])
+    # frame_level_label.append(np.argmax(counts))
+    # out = np.array(frame_level_label)
+    #
+    # equip = (torch_out.numpy() == out).all()
+    # if equip == False:
+    #     print(1)
 
-    counts = np.bincount(label_dict[index: index+frame_shift])
-    frame_level_label.append(np.argmax(counts))
-
-    return np.array(frame_level_label)
+    return torch_out
 
 def expandWindow(data, left, right):
     data = data.detach().cpu().numpy()
