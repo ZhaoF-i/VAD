@@ -9,6 +9,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="49a85523-2b27-49d5-8be2-fbac6442415f" name="ZhaoFei@202.207.12.156">
+        <fileTransfer rootFolder="/home/ZhangXueLiang/ZhaoFei" accessType="SFTP" host="202.207.12.156" port="9406" sshConfigId="275de403-f268-4bb3-9f86-f6adfe055c0e" sshConfig="ZhaoFei@202.207.12.156:9406 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

@@ -11,6 +11,7 @@ def one_hot(input, n_class):
     return label_one_hot
 
 def frame_level_label(label_dict, frame_len, frame_shift):
+
     label_dict = np.pad(label_dict, (frame_shift, frame_shift), 'symmetric')
     input = torch.Tensor(label_dict).unsqueeze(0).unsqueeze(0)
     kernel = torch.ones(frame_len).unsqueeze(0).unsqueeze(0)
