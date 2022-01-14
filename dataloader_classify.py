@@ -6,7 +6,7 @@ from tqdm import tqdm
 import soundfile as sf
 from torch.autograd.variable import *
 import torchaudio
-from utils.util import frame_level_label, one_hot
+from utils.util import frame_level_label, batch_frame_level_label
 import numpy as np
 import pickle, os
 
@@ -48,11 +48,8 @@ class BatchDataLoader(object):
     @staticmethod
     def collate_fn(batch):
         batch.sort(key=lambda x: x[0].size()[0], reverse=True)
-        wav, tag,alpha_pow = zip(*batch)
+        wav, tag, alpha_pow = zip(*batch)
 
-        # wav_pad = []
-        # for i, i_data in enumerate(wav):
-        #     wav_pad.append(i_data)
 
         wav_batch = pad_sequence(wav, batch_first=True)
         tag_batch=pad_sequence(tag,batch_first=True)
