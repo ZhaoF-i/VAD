@@ -77,7 +77,7 @@ class sisdr_loss(object):
 
 class crossentropy_loss(object):
     def __init__(self):
-        self.weight=torch.tensor([1/2,1/6,1/2]).cuda()
+        self.weight=torch.tensor([1/1.5,1/7,1/1.5]).cuda()
         self.CrossEntropyLoss=torch.nn.CrossEntropyLoss(weight=self.weight)
 
     def __call__(self, est, data_info):
