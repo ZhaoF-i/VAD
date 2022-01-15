@@ -132,8 +132,8 @@ if __name__ == '__main__':
     cnt = 0.  #
     for epoch in range(start_epoch, config['MAX_EPOCH']):
         # set learning rate for every epoch
-        for param_group in optimizer.param_groups:
-            param_group['lr'] = lr_list[epoch]
+        # for param_group in optimizer.param_groups:
+        #     param_group['lr'] = lr_list[epoch]
 
         # initial param
         accu_train_loss = 0.0

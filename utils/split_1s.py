@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 if __name__ == '__main__':
     # name_lst=list(Path("/data01/spj/ai_shell4_vad/TRAIN/seg_wav/").rglob('*.wav'))
+
     wav_lst=list(Path("/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_wav/").rglob('*.wav'))
     label_lst = list(Path("/data01/spj/asr_dataset/ai_shell4_vad/TRAIN/seg_label/").rglob('*.npy'))
     wav_lst = sorted(wav_lst)

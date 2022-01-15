@@ -40,11 +40,10 @@ class Test(object):
             pbar.update_progress(i, 'test', '')
             mix, fs = sf.read(self.inpath + 'seg_wav/' + tt_lst[i])
             mix = mix[:,0]
-            alpha_pow = 1 / (np.sqrt(np.sum(mix ** 2)) / (mix.size) + 1e-7)
+            alpha_pow = 1 / (np.sqrt(np.sum(mix ** 2)) / ((mix.size) + 1e-7) + 1e-7)
             mix = mix * alpha_pow
             mixture = Variable(torch.FloatTensor(mix.astype('float32')))
             mixture = mixture.unsqueeze(0)
-
 
             """------------------------------------modify  area------------------------------------"""
             with torch.no_grad():
