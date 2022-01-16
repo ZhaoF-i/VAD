@@ -33,4 +33,4 @@ OUTPUT_DIR: '/data01/zhaofei/result/'                                          #
 BEST_MODEL: 'best.ckpt'                                                       # 默认最好模型名称
 MID_MODEL: 'val.ckpt'                                                         # 默认中间模型名称
 SAVE_BEST_ONLY: False                                                         # [True,False]:[仅保存最好的模型,保存中间模型]
-WORKSPACE: '/VAD-baseline_1sCut_SingleChannel_Mel'                                                        # 子项目名称
+WORKSPACE: '/VAD-baseline_1sCut_SingleChannel_Mel_ConsistentLoss'                              # 子项目名称
