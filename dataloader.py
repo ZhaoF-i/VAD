@@ -26,7 +26,7 @@ class Dataset(Dataset):
 
         sample=(
             Variable(torch.FloatTensor(wav.astype('float32'))),
-            Variable(torch.LongTensor(label.astype('int64'))),
+            label,
             alpha_pow
         )
         return sample

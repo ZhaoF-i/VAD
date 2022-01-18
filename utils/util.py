@@ -3,7 +3,7 @@ import os
 import re
 import torch
 from torch.autograd import Variable
-import torch.nn.funtional as F
+import torch.nn.functional as F
 
 def one_hot(input, n_class):
     one_hot = torch.zeros(len(input), n_class)
