@@ -33,6 +33,7 @@ class Metrics(object):
 
             groud = np.load(self.tt_path + wavlst[i] + '.npy')
             groud = frame_level_label(groud, 320, 160)
+            groud = np.array(groud)
 
             est_lst = []
             for j in range(est.shape[-1]):
