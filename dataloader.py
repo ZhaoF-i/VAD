@@ -13,7 +13,7 @@ import pickle, os
 class Dataset(Dataset):
     def __init__(self, mode='train'):
         super().__init__()
-        self.lst=np.load("./"+mode+".npy",allow_pickle=True)
+        self.lst=np.load("./"+mode+"_1s.npy",allow_pickle=True)
         self.mode=mode
     def __getitem__(self, index):
         wav,_=sf.read(str(self.lst[index]))
