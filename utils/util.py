@@ -23,24 +23,6 @@ def frame_level_label(label_dict, frame_len, frame_shift):
     torch_frame_label = torch_label + half
     torch_out = torch.as_tensor(torch_frame_label, dtype=torch.int64)
 
-    # frame_level_label = []
-    # counts = np.bincount(label_dict[frame_shift: frame_len])
-    # frame_level_label.append(np.argmax(counts))
-    #
-    # index = frame_shift
-    # for i in range(1, int(label_dict.size / frame_shift) - 2):
-    #     counts = np.bincount(label_dict[index: index+frame_len])
-    #     index += frame_shift
-    #     frame_level_label.append(np.argmax(counts))
-    #
-    # counts = np.bincount(label_dict[index: index+frame_shift])
-    # frame_level_label.append(np.argmax(counts))
-    # out = np.array(frame_level_label)
-    #
-    # equip = (torch_out.numpy() == out).all()
-    # if equip == False:
-    #     print(1)
-
     return torch_out
 
 def batch_frame_level_label(ready_label, label_dict, frame_len, frame_shift):
