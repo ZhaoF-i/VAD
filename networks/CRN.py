@@ -52,7 +52,7 @@ class NET_Wrapper(nn.Module):
 
         input = input_data_c1.permute(0, 2, 1)
         spec_feature = self.Spec(input)
-        input_feature = spec_feature.permute(0, 1, 3, 2)
+        input_feature = spec_feature.permute(0, 1, 3, 2, 4)
 
         input_feature = torch.view_as_real(input_feature)
         input_feature = torch.cat([input_feature[:,:,:,:,0], input_feature[:,:,:,:,0]], dim=1)
