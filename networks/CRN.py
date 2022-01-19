@@ -54,7 +54,7 @@ class NET_Wrapper(nn.Module):
         spec_feature = self.Spec(input)
         input_feature = spec_feature.permute(0, 1, 3, 2, 4)
 
-        input_feature = torch.view_as_real(input_feature)
+        # input_feature = torch.view_as_real(input_feature)
         input_feature = torch.cat([input_feature[:,:,:,:,0], input_feature[:,:,:,:,0]], dim=1)
 
         e1 = self.conv1_relu(self.conv1_bn(self.conv1(self.pad(input_feature))))
