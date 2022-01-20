@@ -12,14 +12,14 @@
       <paths name="ZhaoFei@202.207.12.156">
         <serverdata>
           <mappings>
-            <mapping deploy="/PycharmProject/VAD/Alimeeting_VAD" local="$PROJECT_DIR$" web="/" />
+            <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
       <paths name="ZhaoFei@202.207.12.156:9406 password">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/ZhangXueLiang/ZhaoFei/PycharmProject/VAD/Alimeeting_VAD" local="$PROJECT_DIR$" />
+            <mapping deploy="/PycharmProject/VAD/Alimeeting_VAD" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
