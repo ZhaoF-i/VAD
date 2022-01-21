@@ -12,7 +12,7 @@
       <paths name="ZhaoFei@202.207.12.156">
         <serverdata>
           <mappings>
-            <mapping deploy="/PycharmProject/VAD/Alimeeting_VAD" local="$PROJECT_DIR$" web="/" />
+            <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
@@ -27,6 +27,13 @@
         <serverdata>
           <mappings>
             <mapping deploy="/PycharmProject/VAD/Alimeeting_VAD" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="far-106_torch">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
