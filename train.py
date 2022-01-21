@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
         for i, batch_info in enumerate(tr_batch_dataloader.get_dataloader()):
             features, labels = batch_info[0].cuda(), batch_info[1].cuda()
-
+            # a = batch_info[2].cuda()
             # forward + backward + optimize
             optimizer.zero_grad()
             outputs = network(features)

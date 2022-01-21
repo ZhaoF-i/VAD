@@ -24,6 +24,26 @@ def frame_level_label(label_dict, frame_len, frame_shift):
 
     return torch_out
 
+def batch_frame_level_label(label_dict, frame_len, frame_shift):
+
+    label_dict = np.array(label_dict)
+    a = label_dict[:,:frame_shift][::-1]
+    b = label_dict[:, 16000-frame_shift:][::-1]
+
+    label_dict = np.concatenate([label_dict, b], 1)
+    label_dict = np.concatenate([a, label_dict], 1)
+    input = torch.Tensor(label_dict).unsqueeze(1)
+    kernel = torch.ones(frame_len).unsqueeze(0).unsqueeze(0)
+    torch_label = F.conv1d(input=input, weight=kernel, stride=frame_shift)
+    torch_label = torch_label.squeeze()
+    half = torch.ones((torch_label.shape[0], torch_label.shape[1])) / 2  # + 0.00001
+    torch_label /= frame_len
+
+    torch_frame_label = torch_label + half
+    torch_out = torch.as_tensor(torch_frame_label, dtype=torch.int64)
+
+    return torch_out
+
 def expandWindow(data, left, right):
     data = data.detach().cpu().numpy()
     sp = data.shape

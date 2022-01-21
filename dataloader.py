@@ -6,7 +6,7 @@ from tqdm import tqdm
 import soundfile as sf
 from torch.autograd.variable import *
 import torchaudio
-from utils.util import frame_level_label, one_hot
+from utils.util import frame_level_label, batch_frame_level_label
 import numpy as np
 import pickle, os
 
@@ -22,11 +22,13 @@ class Dataset(Dataset):
 
         label=np.load('/data01/zhaofei/data/asr_dataset/ai_shell4_vad/TRAIN/seg_label/'+self.lst[index].stem+'.npy')
         label=np.minimum(label, 2)
-        label=frame_level_label(label, frame_len=320, frame_shift=160)
+        ready_label=frame_level_label(label, frame_len=320, frame_shift=160)
 
         sample=(
             Variable(torch.FloatTensor(wav.astype('float32'))),
+            # Variable(torch.FloatTensor(label.astype('int64'))),
             label,
+            ready_label,
             alpha_pow
         )
         return sample
@@ -46,16 +48,17 @@ class BatchDataLoader(object):
     @staticmethod
     def collate_fn(batch):
         batch.sort(key=lambda x: x[0].size()[0], reverse=True)
-        wav, tag,alpha_pow = zip(*batch)
+        wav, tag, ready_tag, alpha_pow = zip(*batch)
 
-        # wav_pad = []
-        # for i, i_data in enumerate(wav):
-        #     wav_pad.append(i_data)
+        tag = batch_frame_level_label(tag, 320, 160)
 
-        wav_batch = pad_sequence(wav, batch_first=True)
-        tag_batch=pad_sequence(tag,batch_first=True)
+        # wav = torch.Tensor(wav)
+        # ready_tag = torch.Tensor(ready_tag)
 
-        return [wav_batch, tag_batch,alpha_pow]
+        wav = pad_sequence(wav, batch_first=True)
+        ready_tag=pad_sequence(ready_tag,batch_first=True)
+
+        return [wav, tag, ready_tag, alpha_pow]
         # return [wav, tag_batch]
 
 
