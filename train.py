@@ -14,7 +14,7 @@ from criteria import *
 from dataloader_classify import *
 from utils.Checkpoint import Checkpoint
 # from networks.CRN_multi_channel_complex import NET_Wrapper
-from networks.CRN import NET_Wrapper
+from networks.Resnet1D import Resnet1D
 from utils.progressbar import progressbar as pb
 from utils.util import makedirs, saveYAML
 
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"] = config['CUDA_ID']
 
     # set model and optimizer
-    network = NET_Wrapper(config['WIN_LEN'], config['WIN_OFFSET'])
+    network = Resnet1D()
     network = nn.DataParallel(network)
     network.cuda()
     parameters = sum(p.numel() for p in network.parameters() if p.requires_grad)
@@ -132,8 +132,8 @@ if __name__ == '__main__':
     cnt = 0.  #
     for epoch in range(start_epoch, config['MAX_EPOCH']):
         # set learning rate for every epoch
-        for param_group in optimizer.param_groups:
-            param_group['lr'] = lr_list[epoch]
+        # for param_group in optimizer.param_groups:
+        #     param_group['lr'] = lr_list[epoch]
 
         # initial param
         accu_train_loss = 0.0
