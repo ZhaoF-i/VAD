@@ -82,10 +82,10 @@ class Resnet1D(nn.Module):
         self.block4 = ResnetBlock(self.n_cnn_filters[2], self.n_cnn_filters[2], self.n_cnn_kernels, 1)
 
         # Flatten
-        self.flat = nn.Flatten()
+        self.flat = nn.Flatten(2,3)
 
         # FC
-        self.fc1 = nn.Linear(self.n_cnn_filters[2] * 65, self.n_fc_units[0])
+        self.fc1 = nn.Linear(self.n_cnn_filters[2] * 49, self.n_fc_units[0])
         self.relu1 = nn.ReLU()
         self.fc2 = nn.Linear(self.n_fc_units[0], self.n_fc_units[1])
         self.relu2 = nn.ReLU()
@@ -102,7 +102,8 @@ class Resnet1D(nn.Module):
         out_block3 = self.block3(out_block2)
         out_block4 = self.block4(out_block3)
 
-        x = self.flat(out_block4)
+        x = out_block4.permute(0,2,1,3)
+        x = self.flat(x)
         x = self.fc1(x)
         x = self.fc2(x)
         outputs = self.fc3(x)
