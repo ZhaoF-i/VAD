@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torchaudio
 
 
 def same_padding(kernel):
@@ -89,9 +90,12 @@ class Resnet1D(nn.Module):
         self.fc2 = nn.Linear(self.n_fc_units[0], self.n_fc_units[1])
         self.relu2 = nn.ReLU()
         self.fc3 = nn.Linear(self.n_fc_units[1], self.n_classes)
+        self.mel = torchaudio.transforms.MelSpectrogram(n_mels=64)
 
 
     def forward(self, inputs):
+        inputs = self.mel(inputs).unsqueeze(1)
+        inputs = inputs.permute(0,1,3,2)
 
         out_block1 = self.block1(inputs)
         out_block2 = self.block2(out_block1)
