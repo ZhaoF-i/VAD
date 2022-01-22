@@ -90,6 +90,7 @@ class Resnet1D(nn.Module):
         self.relu2 = nn.ReLU()
         self.fc3 = nn.Linear(self.n_fc_units[1], self.n_classes)
 
+
     def forward(self, inputs):
 
         out_block1 = self.block1(inputs)
