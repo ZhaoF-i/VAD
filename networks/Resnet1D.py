@@ -107,5 +107,6 @@ class Resnet1D(nn.Module):
         x = self.fc1(x)
         x = self.fc2(x)
         outputs = self.fc3(x)
+        outputs = outputs.permute(0, 2, 1)
 
         return outputs
