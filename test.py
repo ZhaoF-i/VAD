@@ -8,7 +8,7 @@ from pathlib import Path
 from torch import nn
 from metrics_classify import Metrics
 # from metrics import Metrics
-from networks.CRN import NET_Wrapper
+from networks.Resnet1D import Resnet1D
 from utils.Checkpoint import Checkpoint
 from utils.progressbar import progressbar as pb
 from utils.stft_istft import STFT
@@ -85,12 +85,12 @@ if __name__ == '__main__':
     _outpath = config['OUTPUT_DIR'] + _project + config['WORKSPACE']
     # if offline test
     # _outpath = config['OFFLINE_TEST_DIR'] + _project + config['WORKSPACE']
-    outpath = _outpath + '/estimations_best/'
+    outpath = _outpath + '/estimations_mid_best/'
     makedirs([outpath])
 
     os.environ["CUDA_VISIBLE_DEVICES"] = config['CUDA_ID']
     if args.new_test:
-        network = NET_Wrapper(config['WIN_LEN'], config['WIN_OFFSET'])
+        network = Resnet1D()
         network = nn.DataParallel(network)
         network.cuda()
 
