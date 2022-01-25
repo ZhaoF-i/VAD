@@ -14,7 +14,6 @@ from criteria import *
 # from dataloader_VAD_multi_channel import *
 from dataloader import *
 from utils.Checkpoint import Checkpoint
-# from networks.CRN_multi_channel_complex import NET_Wrapper
 from networks.CRN import NET_Wrapper
 from utils.progressbar import progressbar as pb
 from utils.util import makedirs, saveYAML
