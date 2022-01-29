@@ -85,7 +85,7 @@ if __name__ == '__main__':
     _outpath = config['OUTPUT_DIR'] + _project + config['WORKSPACE']
     # if offline test
     # _outpath = config['OFFLINE_TEST_DIR'] + _project + config['WORKSPACE']
-    outpath = _outpath + '/estimations_mid_best/'
+    outpath = _outpath + '/24-2000-val/'
     makedirs([outpath])
 
     os.environ["CUDA_VISIBLE_DEVICES"] = config['CUDA_ID']
